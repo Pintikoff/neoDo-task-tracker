@@ -15,18 +15,32 @@ void helpCmd(){
     printf(" -l : Lists the todolist.\n");
 }
 
-void addTodo(struct Todo *todoList, char *idString, char *content){  
+void addTodo(struct Todo *todoList, char *idString, char *content){ 
+    FILE *ftpr;
+    ftpr = fopen("todocli.json","a");
+    
     int id = atoi(idString);
-    strcpy(todoList[id-1].content, content);
-    todoList[id-1].id = id;
+    int index = id - 1;
+    strcpy(todoList[index].content, content);
+    todoList[index].id = id;
 
-    printf("%d %s", todoList[0].id, todoList[0].content);
+    fprintf(ftpr, "%d: %s \n", todoList[index].id, todoList[index].content);
+    fclose(ftpr);
+    printf("Added: %d %s", todoList[index].id, todoList[index].content);
 }
 
+
+
 void printTodo(struct Todo *todoList){
-    for (int i = 0; i < 5; i++){;
-        printf("%d. ID: %d - %s.",i+1, todoList[i].id, todoList[i].content);
+    FILE *ftpr;
+    ftpr = fopen("todocli.json","r");
+
+    char fileContent[100];
+    while (fgets(fileContent, 100, ftpr))
+    {
+        printf("%s", fileContent);
     }
+
 }
 
 void genASCII(){
@@ -40,8 +54,12 @@ void genASCII(){
 }
 
 int main(int argc, char* argv[]){
-    struct Todo todoList[5] = {0};
+    struct Todo *todoList = malloc(sizeof(struct Todo));
+    if (todoList == NULL){
 
+        printf("error");
+        return 1;
+    }
     //genASCII();
     if(argc >= 2){
         if(strcmp(argv[1], "-a") == 0 && argv[2] && argv[3]){
@@ -58,6 +76,6 @@ int main(int argc, char* argv[]){
             printf("No such option is available. Check the -h command");
         }
     }
-
+    free(todoList);
     return 0;
 }
