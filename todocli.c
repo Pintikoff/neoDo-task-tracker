@@ -8,32 +8,64 @@ struct Todo
     char content[30];
 };
 
-
 void helpCmd(){
     printf("THIS  IS  A  HELP  PAGE  FOR  todocli.\n\n");
     printf(" -a [id]: Add command adds a given string to a todo list.\n");
     printf(" -l : Lists the todolist.\n");
 }
 
-void addTodo(struct Todo *todoList, char *idString, char *content){ 
+int readJSON(struct Todo **todoList){
     FILE *ftpr;
-    ftpr = fopen("todocli.json","a");
-    
-    int id = atoi(idString);
-    int index = id - 1;
-    strcpy(todoList[index].content, content);
-    todoList[index].id = id;
+    ftpr = fopen("todocli.txt","r");
 
-    fprintf(ftpr, "%d: %s \n", todoList[index].id, todoList[index].content);
-    fclose(ftpr);
-    printf("Added: %d %s", todoList[index].id, todoList[index].content);
+    int count = 0;
+    char lineContent[100];
+
+    while (fgets(lineContent, sizeof(lineContent), ftpr))
+    {
+        count ++;
+    }
+
+    *todoList = malloc(sizeof(struct Todo) * (count+1));
+    if (todoList == NULL){
+        printf("error");
+        return 0;
+    }
+
+    rewind(ftpr);
+
+    int i = 0;
+    while (fgets(lineContent, sizeof(lineContent), ftpr))
+    {
+        int id;
+        char content[30];
+
+        sscanf(lineContent, "%d, %[^;]", &id, content);
+        (*todoList)[i].id = id;
+        strcpy((*todoList)[i].content, content);
+
+        i++;
+    }
+
+    return count;
 }
 
-
-
-void printTodo(struct Todo *todoList){
+void addTodo(struct Todo *todoList, char *content, int count){
     FILE *ftpr;
-    ftpr = fopen("todocli.json","r");
+    ftpr = fopen("todocli.txt","a");
+
+    todoList[count].id = count+1;
+    strcpy(todoList[count].content, content);
+
+    printf("Task added succesfully (ID: %d): %s\n", todoList[count].id, todoList[count].content);
+
+    fprintf(ftpr, "%d: %s \n", todoList[count].id, todoList[count].content);
+    fclose(ftpr);
+}
+
+void printTodo(){
+    FILE *ftpr;
+    ftpr = fopen("todocli.txt","r");
 
     char fileContent[100];
     while (fgets(fileContent, 100, ftpr))
@@ -54,19 +86,20 @@ void genASCII(){
 }
 
 int main(int argc, char* argv[]){
-    struct Todo *todoList = malloc(sizeof(struct Todo));
+    struct Todo *todoList = NULL;
+    int count = readJSON(&todoList);
     if (todoList == NULL){
-
         printf("error");
         return 1;
     }
+
     //genASCII();
     if(argc >= 2){
-        if(strcmp(argv[1], "-a") == 0 && argv[2] && argv[3]){
-                addTodo(todoList, argv[2], argv[3]);  
+        if(strcmp(argv[1], "-a") == 0 && argv[2]){
+                addTodo(todoList, argv[2], count);  
         }
         else if (strcmp(argv[1], "-l") == 0){
-            printTodo(todoList);
+            printTodo();
         }
         else if (strcmp(argv[1], "-h") == 0){
             genASCII();
