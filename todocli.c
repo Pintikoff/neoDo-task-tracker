@@ -68,6 +68,9 @@ void genASCII(){
 }
 
 void addTodo(struct Todo *todoList, char *content, int count){
+    if(!content){
+        return;
+    }
     todoList[count].id = count+1;
     strcpy(todoList[count].content, content);
     strcpy(todoList[count].status, "todo");
@@ -79,11 +82,11 @@ void addTodo(struct Todo *todoList, char *content, int count){
 
 void deleteTodo(struct Todo *todoList, char *argv, int *count){
     int id = atoi(argv);
-    int wantedInd = id - 1;
     if (id <= 0 || id > *count){
         return;
     }
 
+    int wantedInd = id - 1;
     for(int i = wantedInd; i < *count; i++){
         todoList[i] = todoList[i+1];
         todoList[i-1].id = i;
@@ -93,14 +96,15 @@ void deleteTodo(struct Todo *todoList, char *argv, int *count){
     updateFile(todoList, *count);
 }
 
-void updateTodo(struct Todo *todoList, char *argv2, char *argv3, int count){
-    int id = atoi(argv2);
-    int wantedInd = id - 1;
-    if (id <= 0 || id > count){
+void updateTodo(struct Todo *todoList, char *givenId, char *content, int count){
+    int id = atoi(givenId);
+    if(id <= 0 || id > count || !content || !id){
+        printf("Syntax error. check -h command");
         return;
     }
     
-    strcpy(todoList[wantedInd].content, argv3);
+    int wantedInd = id - 1;    
+    strcpy(todoList[wantedInd].content, content);
     updateFile(todoList, count);
 }
 
@@ -122,7 +126,7 @@ void helpTodo(){
     printf("   -a   : Add command adds a given string to a todo list.\n");
     printf("   -l   : Lists the todolist.\n");
     printf(" -d [id]: Deletes a chosen task.\n");
-    printf(" -u [id]: Update a chosen task.\n");
+    printf("-u [id] : Update a chosen task.\n");
     printf(" -clear : deletes WHOLE todo-todo list (clears whole data).\n");
     printf("   -h   : Displays this help command.\n\n");
 }
@@ -146,6 +150,7 @@ int main(int argc, char* argv[]){
         else if (strcmp(argv[1], "-u") == 0 && argc >= 3){
             updateTodo(todoList, argv[2], argv[3], count);
         }
+        else if (strcmp(argv[1], "-m") == 0 && argc)
         else if (strcmp(argv[1], "-l") == 0){
             listTodo(todoList,count);
         }
