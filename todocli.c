@@ -144,7 +144,6 @@ void listTodo(struct Todo *todoList,int count){
 void clearTodo(){
     FILE *ftpr;
     ftpr = fopen("todocli.txt","w");
-    fprintf(ftpr, " ");
 }
 
 void helpTodo(){
