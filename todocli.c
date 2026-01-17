@@ -11,8 +11,7 @@ struct Todo
 
 //adds todos from a file to a struct
 int readTodo(struct Todo **todoList){
-    FILE *ftpr;
-    ftpr = fopen("todocli.txt", "r");
+    FILE *ftpr = fopen("todocli.txt", "r");
     if (!ftpr) {
         ftpr = fopen("todocli.txt", "w");
         ftpr = fopen("todocli.txt", "r");
@@ -52,8 +51,7 @@ int readTodo(struct Todo **todoList){
 }
 
 void updateFile(struct Todo *todoList, int count){
-    FILE *ftpr;
-    ftpr = fopen("todocli.txt", "w");
+    FILE *ftpr = fopen("todocli.txt", "w");
     for(int i = 0; i < count; i++){
         //some trob;es with spacing here
         fprintf(ftpr, "%d: %s|%s\n", todoList[i].id, todoList[i].content, todoList[i].status);
@@ -72,21 +70,22 @@ void genASCII(){
 }
 
 void addTodo(struct Todo *todoList, char *content, int count){
-    if(!content){
+    if(!content || content == " "){
+        printf("ERROR: Enter a valid content.");
         return;
     }
     todoList[count].id = count+1;
     strcpy(todoList[count].content, content);
     strcpy(todoList[count].status, "todo");
 
-    printf("Task added succesfully (ID: %d): %s\n", todoList[count].id, todoList[count].content);
-    printf("Task status: %s", todoList[count].status);
     updateFile(todoList, count+1);
+    printf("A task '%s' has been succesfully added #%d\n", todoList[count].content, todoList[count].id);
 }
 
 void deleteTodo(struct Todo *todoList, char *argv, int *count){
     int id = atoi(argv);
     if (id <= 0 || id > *count){
+        printf("ERROR: Not valid id");
         return;
     }
 
@@ -98,27 +97,39 @@ void deleteTodo(struct Todo *todoList, char *argv, int *count){
     
     (*count) --;
     updateFile(todoList, *count);
+    printf("Task #%d has been succesfuly deleted", id);
 }
 
 void updateTodo(struct Todo *todoList, char *givenId, char *content, int count){
     int id = atoi(givenId);
     if(id <= 0 || id > count || !content){
-        printf("Syntax error. check -h command");
+        printf("ERROR: Not valid id");
         return;
     }
+    if(!content || content == " "){
+        printf("ERROR: Enter a valid content");
+        return;
+    }    
     
     int wantedInd = id - 1;    
     strcpy(todoList[wantedInd].content, content);
     updateFile(todoList, count);
+
+    printf("Todo #%d has been succesfuly updated to: '%s'", id, todoList[wantedInd].content);
 }
 
 void updateState(struct Todo *todoList, char *givenId, char *givenState, int count){
     int id = atoi(givenId);
     int statusId = atoi(givenState);
-    if(id <= 0 || id > count || statusId < 1 || statusId > 3){
-        printf("Syntax error. check -h command");
+    if(id <= 0 || id > count){
+        printf("ERROR: Not valid id");
         return;
     }
+    if(statusId < 1 || statusId > 3){
+        printf("ERROR: Not valid status ID(1-3). check -h operator");
+        return;
+    }
+
     int wantedInd = id - 1;
     switch(statusId){
         case 1:
@@ -131,30 +142,30 @@ void updateState(struct Todo *todoList, char *givenId, char *givenState, int cou
             strcpy(todoList[wantedInd].status, "done");
             break;
     }
-    printf("%s", todoList[wantedInd].status);
     updateFile(todoList, count);
+    printf("Todo #%d status changed to: '%s'\n", id, todoList[wantedInd].status);
 }
 
 void listTodo(struct Todo *todoList,int count){
     for(int i = 0; i < count; i++){
-        printf("%d: %s | %s\n", todoList[i].id, todoList[i].content, todoList[i].status);
+        printf("ID-%d: %s [%s]\n", todoList[i].id, todoList[i].content, todoList[i].status);
     }
 }
 
 void clearTodo(){
-    FILE *ftpr;
-    ftpr = fopen("todocli.txt","w");
+    FILE *ftpr = fopen("todocli.txt", "w");
+    printf("List has been succesfuly cleared");
 }
 
 void helpTodo(){
     printf("\n");
-    printf("THIS  IS  A  HELP  PAGE  FOR  todocli.\n\n");
-    printf("   -a   : Add command adds a given string to a todo list.\n");
-    printf("   -l   : Lists the todolist.\n");
-    printf(" -d [id]: Deletes a chosen task.\n");
-    printf("-u [id] : Update a chosen task.\n");
-    printf(" -clear : deletes WHOLE todo-todo list (clears whole data).\n");
-    printf("   -h   : Displays this help command.\n\n");
+    printf("THIS  IS  A  HELP  PAGE  FOR  todocli\n\n");
+    printf("   -a   : Add command adds a given string to a todo list\n");
+    printf("   -l   : Lists the todolist\n");
+    printf(" -d [id]: Deletes a chosen task\n");
+    printf("-u [id] : Update a chosen task\n");
+    printf(" -clear : deletes WHOLE todo-todo list (clears whole data)\n");
+    printf("   -h   : Displays this help command\n\n");
 }
 
 int main(int argc, char *argv[]){
