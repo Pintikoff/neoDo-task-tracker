@@ -70,10 +70,22 @@ void genASCII(){
 }
 
 void addTodo(struct Todo *todoList, char *content, int count){
-    if(!content || content == " "){
+    int hasContent = 0;
+    if(!content){
         printf("ERROR: Enter a valid content.");
         return;
     }
+    for(int i = 0; content[i] != '\0'; i++){
+        if(content[i] != ' ' && content[i] != '\t' && content[i] != '\n'){
+            hasContent = 1;
+            break;
+        }
+    }
+    if(hasContent == 0){
+        printf("ERROR: Enter a valid content.");
+        return;
+    }
+    
     todoList[count].id = count+1;
     strcpy(todoList[count].content, content);
     strcpy(todoList[count].status, "todo");
@@ -101,16 +113,26 @@ void deleteTodo(struct Todo *todoList, char *argv, int *count){
 }
 
 void updateTodo(struct Todo *todoList, char *givenId, char *content, int count){
+    int hasContent = 0;
     int id = atoi(givenId);
-    if(id <= 0 || id > count || !content){
+    if(id <= 0 || id > count){
         printf("ERROR: Not valid id");
         return;
     }
-    if(!content || content == " "){
-        printf("ERROR: Enter a valid content");
+    if(!content){
+        printf("ERROR: Enter a valid content.");
         return;
-    }    
-    
+    }
+    for(int i = 0; content[i] != '\0'; i++){
+        if(content[i] != ' ' && content[i] != '\t' && content[i] != '\n'){
+            hasContent = 1;
+            break;
+        }
+    }
+    if(hasContent == 0){  
+        printf("ERROR: Enter a valid content.");
+        return;
+    }
     int wantedInd = id - 1;    
     strcpy(todoList[wantedInd].content, content);
     updateFile(todoList, count);
@@ -118,7 +140,7 @@ void updateTodo(struct Todo *todoList, char *givenId, char *content, int count){
     printf("Todo #%d has been succesfuly updated to: '%s'", id, todoList[wantedInd].content);
 }
 
-void updateState(struct Todo *todoList, char *givenId, char *givenState, int count){
+void updateState(struct Todo *todoList, char *givenId, char *givenState, int count, char **statusArr){
     int id = atoi(givenId);
     int statusId = atoi(givenState);
     if(id <= 0 || id > count){
@@ -131,17 +153,7 @@ void updateState(struct Todo *todoList, char *givenId, char *givenState, int cou
     }
 
     int wantedInd = id - 1;
-    switch(statusId){
-        case 1:
-            strcpy(todoList[wantedInd].status, "todo");
-            break;
-        case 2:
-            strcpy(todoList[wantedInd].status, "in-progress");
-            break;
-        case 3:
-            strcpy(todoList[wantedInd].status, "done");
-            break;
-    }
+    strcpy(todoList[wantedInd].status, statusArr[statusId]);
     updateFile(todoList, count);
     printf("Todo #%d status changed to: '%s'\n", id, todoList[wantedInd].status);
 }
@@ -170,6 +182,7 @@ void helpTodo(){
 
 int main(int argc, char *argv[]){
     struct Todo *todoList = NULL;
+    char* statusArr[] = {"", "Todo", "In-progress", "Done"};  
     int count = readTodo(&todoList);
     if (todoList == NULL){
         printf("error");
@@ -188,7 +201,7 @@ int main(int argc, char *argv[]){
             updateTodo(todoList, argv[2], argv[3], count);
         }
         else if (strcmp(argv[1], "-m") == 0 && argc >= 3){
-            updateState(todoList, argv[2], argv[3], count);
+            updateState(todoList, argv[2], argv[3], count, statusArr);
         }
         else if (strcmp(argv[1], "-l") == 0){
             listTodo(todoList,count);
