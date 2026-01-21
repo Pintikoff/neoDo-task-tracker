@@ -9,7 +9,23 @@ struct Todo
     char status[15];
 };
 
-//adds todos from a file to a struct
+/**
+ *     __   __     ______     ______     _____     ______    
+ *    /\ "-.\ \   /\  ___\   /\  __ \   /\  __-.  /\  __ \   
+ *    \ \ \-.  \  \ \  __\   \ \ \/\ \  \ \ \/\ \ \ \ \/\ \  
+ *     \ \_\\"\_\  \ \_____\  \ \_____\  \ \____-  \ \_____\ 
+ *      \/_/ \/_/   \/_____/   \/_____/   \/____/   \/_____/ 
+ *                                                           
+ */
+
+void genASCII(){
+    printf(" __   __     ______     ______     _____     ______  \n");
+    printf("/\\ \"-.\\ \\   /\\  ___\\   /\\  __ \\   /\\  __-.  /\\  __ \\   \n");
+    printf("\\ \\ \\-.  \\  \\ \\  __\\   \\ \\ \\/\\ \\  \\ \\ \\/\\ \\ \\ \\ \\/\\ \\  \n");
+    printf(" \\ \\_\\\\\"\\_\\  \\ \\_____\\  \\ \\_____\\  \\ \\____-  \\ \\_____\\ \n");
+    printf("  \\/_/ \\/_/   \\/_____/   \\/_____/   \\/____/   \\/_____/ \n");
+}
+
 int readTodo(struct Todo **todoList){
     FILE *ftpr = fopen("neoDo.json", "r");
     if (!ftpr) {
@@ -86,20 +102,10 @@ void updateFile(struct Todo *todoList, int count){
     fclose(ftpr);
 }
 
-void genASCII(){
-    printf("   ___       ___       ___       ___            ___       ___       ___   \n");
-    printf("  /\\  \\     /\\  \\     /\\  \\     /\\  \\          /\\  \\     /\\  \\     /\\  \\  \n");
-    printf("  \\:\\  \\   /::\\  \\   /::\\  \\   /::\\  \\        /::\\  \\   /::\\  \\   /::\\  \\ \n");
-    printf("  /: \\__\\ /:/\\:\\__\\ /:/\\:\\__\\ /:/\\:\\__\\      /::\\:\\__\\ /::\\:\\__\\ /::\\:\\__\\ \n");
-    printf(" /:/\\/__/ \\:\\/:/  / \\:\\/:/  / \\:\\/:/  /      \\/\\::/  / \\/\\::/  / \\/\\::/  /\n");
-    printf(" \\/__/     \\::/  /   \\::/  /   \\::/  /         /:/  /     \\/__/     \\/__/ \n");
-    printf("            \\/__/     \\/__/     \\/__/          \\/__/                      \n");
-}
-
 void addTodo(struct Todo *todoList, char *content, int count){
     int hasContent = 0;
     if(!content){
-        printf("ERROR: Enter a valid content.");
+        printf("ERROR_INVALID_CONTENT");
         return;
     }
     for(int i = 0; content[i] != '\0'; i++){
@@ -109,7 +115,7 @@ void addTodo(struct Todo *todoList, char *content, int count){
         }
     }
     if(hasContent == 0){
-        printf("ERROR: Enter a valid content.");
+        printf("ERROR_INVALID_CONTENT");
         return;
     }
     
@@ -124,7 +130,7 @@ void addTodo(struct Todo *todoList, char *content, int count){
 void deleteTodo(struct Todo *todoList, char *argv, int *count){
     int id = atoi(argv);
     if (id <= 0 || id > *count){
-        printf("ERROR: Not valid id");
+        printf("ERROR_INVALID_ID: \"%d\"", id);
         return;
     }
 
@@ -149,7 +155,7 @@ void updateTodo(struct Todo *todoList, char *givenId, char *content, int count){
         return;
     }
     if(!content){
-        printf("ERROR: Enter a valid content.");
+        printf("ERROR_INVALID_CONTENT");
         return;
     }
     for(int i = 0; content[i] != '\0'; i++){
@@ -175,19 +181,17 @@ void updateState(struct Todo *todoList, char *givenId, char *givenState, int cou
     int wantedInd = id - 1;
     char status[15]; 
     if(id < 1 || id > count){
-        printf("ERROR: Not valid id");
+        printf("ERROR_INVALID_ID: \"%d\" (check -h command)", id);
         return;
     }
     //change status with id:
-    if(statusId >= 1 && statusId <= 3){
-        strcpy(status, statusArr[statusId]);  
-    }
+    if(statusId >= 1 && statusId <= 3) strcpy(status, statusArr[statusId]);  
     //change status with string:
-    else if(strcmp(givenState, "todo") == 0||strcmp(givenState, "in-progress") == 0||strcmp(givenState, "done") == 0){
+    else if(strcmp(givenState, "todo") == 0 || strcmp(givenState, "in-progress") == 0 || strcmp(givenState, "done") == 0){
         strcpy(status, givenState);
     }
     else{
-        printf("ERROR: Not valid status ID(1-3). check -h operator");
+        printf("ERROR_INVALID_STATUS: \"%s\" (check -h command)", givenState);
         return;
     }
 
@@ -196,7 +200,7 @@ void updateState(struct Todo *todoList, char *givenId, char *givenState, int cou
     printf("Todo #%d status changed to: '%s'\n", id, todoList[wantedInd].status);
 }
 
-void listTodo(struct Todo *todoList, char *givenState, int count){
+void listTodo(struct Todo *todoList, char *givenState, int count, char **statusArr){
     if(!givenState){
         for(int i = 0; i < count; i++){
             printf("ID-%d: %s [%s]\n", todoList[i].id, todoList[i].content, todoList[i].status);
@@ -205,14 +209,25 @@ void listTodo(struct Todo *todoList, char *givenState, int count){
     } 
     int statusId = atoi(givenState);
     char status[15];
-    //list by status Todo's
+    int printed = 0;
+
+    if(statusId >= 1 && statusId <= 3) strcpy(status, statusArr[statusId]);  
+    else if(strcmp(givenState, "todo") == 0 || strcmp(givenState, "in-progress") == 0 || strcmp(givenState, "done") == 0){
+        strcpy(status, givenState);
+    }
+    else{
+        printf("ERROR_INVALID_STATUS: \"%s\" (check -h command)", givenState);
+        return;
+    }
+    
     for(int i = 0; i < count; i++){
-        if(strcmp(givenState, todoList[i].status) == 0){
+        if(strcmp(todoList[i].status, status) == 0){
             printf("ID-%d: %s [%s]\n", todoList[i].id, todoList[i].content, todoList[i].status);
+            printed ++;
         }
-        else{
-            printf("The're no tasks with \"%s\" status (check help page [-h] for more info)", givenState);
-        }
+    }
+    if(printed == 0){
+        printf("There are no tasks with \"%s\" status", givenState);
     }
 }
 
@@ -222,14 +237,55 @@ void clearTodo(){
 }
 
 void helpTodo(){
+    printf("USAGE:\n");
+    printf("  neoDo [COMMAND] [ARGUMENTS]\n");
     printf("\n");
-    printf("THIS  IS  A  HELP  PAGE  FOR  todocli\n\n");
-    printf("   -a   : Add command adds a given string to a todo list\n");
-    printf("   -l   : Lists the todolist\n");
-    printf(" -d [id]: Deletes a chosen task\n");
-    printf("-u [id] : Update a chosen task\n");
-    printf(" -clear : deletes WHOLE todo-todo list (clears whole data)\n");
-    printf("   -h   : Displays this help command\n\n");
+    printf("COMMANDS:\n");
+    printf("\n");
+    printf("  -a [content]\n");
+    printf("      Add a new task with the given content\n");
+    printf("      Example: neoDo -a \"Buy groceries\"\n");
+    printf("\n");
+    printf("  -d [id]\n");
+    printf("      Delete a task by its ID\n");
+    printf("      Example: neoDo -d 3\n");
+    printf("\n");
+    printf("  -u [id] [new content]\n");
+    printf("      Update the content of an existing task\n");
+    printf("      Example: neoDo -u 2 \"Buy milk and bread\"\n");
+    printf("\n");
+    printf("  -m [id] [status]\n");
+    printf("      Modify the status of a task\n");
+    printf("      Status options:\n");
+    printf("        1 or 'todo'         - Mark as To Do\n");
+    printf("        2 or 'in-progress'  - Mark as In Progress\n");
+    printf("        3 or 'done'         - Mark as Done\n");
+    printf("      Example: neoDo -m 1 2\n");
+    printf("      Example: neoDo -m 1 done\n");
+    printf("\n");
+    printf("  -l [status] (optional)\n");
+    printf("      List all tasks or filter by status\n");
+    printf("      Without argument: shows all tasks\n");
+    printf("      With argument: shows tasks with specific status\n");
+    printf("      Example: neoDo -l\n");
+    printf("      Example: neoDo -l todo\n");
+    printf("      Example: neoDo -l 2\n");
+    printf("\n");
+    printf("  -clear\n");
+    printf("      Clear all tasks from the list\n");
+    printf("      Example: neoDo -clear\n");
+    printf("\n");
+    printf("  -h\n");
+    printf("      Show this help page\n");
+    printf("\n");
+    printf("EXAMPLES:\n");
+    printf("  neoDo -a \"Finish homework\"        # Add a new task\n");
+    printf("  neoDo -l                          # List all tasks\n");
+    printf("  neoDo -m 1 in-progress            # Change task #1 to in-progress\n");
+    printf("  neoDo -l done                     # List all completed tasks\n");
+    printf("  neoDo -d 3                        # Delete task #3\n");
+    printf("\n");
+    printf("==========================================================\n");
 }
 
 int main(int argc, char *argv[]){
@@ -256,7 +312,7 @@ int main(int argc, char *argv[]){
             updateState(todoList, argv[2], argv[3], count, statusArr);
         }
         else if (strcmp(argv[1], "-l") == 0){
-            listTodo(todoList, argv[2], count);
+            listTodo(todoList, argv[2], count, statusArr);
         }
         else if (strcmp(argv[1], "-clear") == 0){
             clearTodo();
