@@ -33,19 +33,8 @@ A simple and efficient command-line task tracker written in C. Manage your tasks
 ### Build from Source
 ```bash
 git clone https://github.com/Pintikoff/neoDo-task-tracker.git
-cd neodo
-gcc -o neoDo main.c
-```
-
-### Optional: Add to PATH
-
-To use `neoDo` from anywhere in your terminal:
-```bash
-# Linux/macOS
-sudo cp neoDo /usr/local/bin/
-
-# Or add to your PATH
-export PATH=$PATH:/path/to/neodo
+cd neoDo-task-tracker\
+gcc -o neoDo .\neoDo.c
 ```
 
 ---
