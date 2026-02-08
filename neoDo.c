@@ -299,10 +299,10 @@ int main(int argc, char *argv[]){
 
     //genASCII();
     if(argc >= 2){
-        if(strcmp(argv[1], "-a") == 0 && argc >= 2){
+        if(strcmp(argv[1], "-a") == 0{
             addTodo(todoList, argv[2], count);  
         }
-        else if (strcmp(argv[1], "-d") == 0 && argc >= 2){
+        else if (strcmp(argv[1], "-d") == 0){
             deleteTodo(todoList, argv[2], &count);
         }
         else if (strcmp(argv[1], "-u") == 0 && argc >= 3){
