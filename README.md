@@ -9,17 +9,14 @@ NeoDo - Command Line Task Tracker
 														 
 A simple and efficient command-line task tracker written in C. Manage your tasks directly from the terminal with persistent JSON storage.
 
-> Project inspired by [roadmap.sh Task Tracker Project](https://roadmap.sh/projects/task-tracker)
-
 ---
 
 ## Features
 
-✅ Add, update, and delete tasks  
-📝 Track task status (todo, in-progress, done)  
-💾 Persistent storage using JSON format  
-🔍 Filter tasks by status  
-🎨 Clean command-line interface  
+ Add, update, and delete tasks  
+ Track task status (todo, in-progress, done)  
+ Persistent storage using JSON format  
+ Filter tasks by status   
 
 ---
 
